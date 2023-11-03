@@ -9,12 +9,14 @@ public class GameManagerX : MonoBehaviour
 {
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI gameOverText;
+    public TextMeshProUGUI timeRemainingText;
     public GameObject titleScreen;
     public Button restartButton; 
 
     public List<GameObject> targetPrefabs;
 
     private int score;
+    private int timeRemaining;
     private float spawnRate = 1.5f;
     public bool isGameActive;
 
@@ -26,11 +28,29 @@ public class GameManagerX : MonoBehaviour
     public void StartGame(int difficulty)
     {
         spawnRate /= difficulty;
+        timeRemaining = 60;
         isGameActive = true;
         StartCoroutine(SpawnTarget());
+        StartCoroutine(CountdownTime());
         score = 0;
         UpdateScore(0);
         titleScreen.SetActive(false);
+    }
+
+    // Timer to countdown a minute, once it reaches 0, game over is triggered
+    IEnumerator CountdownTime()
+    {
+        while (isGameActive)
+        {
+            if (timeRemaining <= 0)
+            {
+                GameOver();
+            }
+            timeRemainingText.text = "Time: " + timeRemaining;
+            yield return new WaitForSeconds(1);
+            timeRemaining -= 1;
+
+        }
     }
 
     // While game is active spawn a random target
@@ -86,5 +106,4 @@ public class GameManagerX : MonoBehaviour
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
-
 }
